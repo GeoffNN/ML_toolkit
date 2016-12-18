@@ -1,12 +1,19 @@
 import numpy as np
 from scipy.spatial.distance import pdist
 
-"""This code is based on Daniel Calandriello's code for the Graphs in ML course at MVA - ENS Cachan."""
+"""This code is based on Daniel Calandriello's code for Michal Valko's Graphs in ML course (2016) at MVA - ENS Cachan."""
 
 
 class GraphParams:
-    def __init__(self, type='knn', thresh=10, sigma2=1):
+    def __init__(self, type='knn', thresh=None, sigma2=1):
         self.type = type
+        if thres is None:
+            if type is 'knn':
+                thresh = 10
+            elif type is 'eps':
+                thresh = 0
+            else:
+                raise GraphTypeError("Not a valid graph type")
         self.thresh = thresh
         self.sigma2 = sigma2
 
@@ -21,6 +28,7 @@ def similarities(X, sigma2, metric='euclidean'):
 
 
 def build_graph(X, graph_params=GraphParams(), metric='euclidean'):
+    """Builds a graph (knn or epsilon) using defined similarity function"""
     graph_type = graph_params.type
     graph_thresh = graph_params.thresh
     sigma2 = graph_params.sigma2
@@ -39,8 +47,5 @@ def build_graph(X, graph_params=GraphParams(), metric='euclidean'):
 
     elif graph_type is 'eps':
         W = sims.where(sims >= graph_thresh)
-
-    else:
-        raise GraphTypeError("Not a valid graph type")
 
     return W
