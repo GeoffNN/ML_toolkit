@@ -17,7 +17,7 @@ class GraphParams:
             if graph_type is 'knn':
                 self.thresh = 10
             elif graph_type is 'eps':
-                self.thresh = 0
+                self.thresh = 1
         if graph_type not in ['knn', 'eps']:
             raise GraphTypeError("Not a valid graph graph_type")
         self.sigma2 = sigma2
@@ -25,6 +25,8 @@ class GraphParams:
 
 class LaplacianParams:
     def __init__(self, normalization='unn', gamma=.05):
+        self.normalization = normalization
+        self.gamma = gamma
 
 
 def build_graph(X, graph_params=GraphParams(), metric='euclidean'):
@@ -32,16 +34,18 @@ def build_graph(X, graph_params=GraphParams(), metric='euclidean'):
     W is sparse - to be optimized somehow
     """
     graph_type = graph_params.type
-    graph_thresh = graph_params.thresh
     sigma2 = graph_params.sigma2
+    graph_thresh = graph_params.thresh
     n = len(X)
     W = np.zeros((n, n))
     if graph_type is 'knn':
         D = kneighbors_graph(X, graph_thresh, metric=metric, mode='distance').toarray()
     elif graph_type is 'eps':
+        graph_thresh = -sigma2 * np.log(graph_thresh)
         D = radius_neighbors_graph(X, graph_thresh, metric=metric, mode='distance').toarray()
     W[D > 0] = np.exp(-D[D > 0] / sigma2)
     return W
+
 
 def build_laplacian(W, laplacian_params):
     normalization = laplacian_params.normalization
