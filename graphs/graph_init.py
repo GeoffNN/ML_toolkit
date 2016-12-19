@@ -1,6 +1,6 @@
 import numpy as np
 from sklearn.neighbors import kneighbors_graph, radius_neighbors_graph
-from scipy.spatial.distance import squareform
+from scipy.linalg import sqrtm, inv
 
 """This code is based on Daniel Calandriello's code for Michal Valko's Graphs in ML course (2016) at MVA - ENS Cachan."""
 
@@ -23,6 +23,10 @@ class GraphParams:
         self.sigma2 = sigma2
 
 
+class LaplacianParams:
+    def __init__(self, normalization='unn', gamma=.05):
+
+
 def build_graph(X, graph_params=GraphParams(), metric='euclidean'):
     """Builds a graph (knn or epsilon) weight matrix W
     W is sparse - to be optimized somehow
@@ -38,3 +42,16 @@ def build_graph(X, graph_params=GraphParams(), metric='euclidean'):
         D = radius_neighbors_graph(X, graph_thresh, metric=metric, mode='distance').toarray()
     W[D > 0] = np.exp(-D[D > 0] / sigma2)
     return W
+
+def build_laplacian(W, laplacian_params):
+    normalization = laplacian_params.normalization
+    gamma = laplacian_params.gamma
+    D = np.diag(W.sum())
+    if normalization is 'unn':
+        L = D - W
+    elif normalization is 'rw':
+        L = np.eye(len(W)) - inv(D).dot(W)
+    elif normalization is 'sym':
+        d = inv(sqrtm(D))
+        L = np.eye(len(W)) - d.dot(W).dot(d)
+    return L + gamma * np.eye(len(L))
