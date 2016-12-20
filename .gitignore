@@ -4,3 +4,5 @@
 *.pyc
 *.m
 code_material/
+/offline_face_recognition/
+Would skip repository offline_face_recognition/
