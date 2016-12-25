@@ -55,4 +55,4 @@ X_t, Y_t = blobs(150, 3, 2)
 X = np.append(X_t[:100], np.zeros((50, 2)), axis=0)
 Y = np.append(Y_t[:100] + 1, np.zeros(50), axis=0)
 labs = hfs(X, Y)
-print((labs == (Y_t + 1)).mean())
+assert (labs == (Y_t + 1)).mean() > .66
