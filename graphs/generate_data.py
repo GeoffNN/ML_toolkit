@@ -1,9 +1,8 @@
 from sklearn.datasets import make_blobs
 
 
-def blobs(n_samples, dist_options):
+def blobs(n_samples, n_blobs, blob_var):
     """Generates data from sklearn's Blob distribution"""
-    n_blobs, blob_var = dist_options
     return make_blobs(n_samples, centers=n_blobs, cluster_std=blob_var)
 
 
@@ -13,4 +12,4 @@ def get_from_dataset(f=""):
     if f is "":
         raise FileNotFoundError
 
-X, Y = blobs(100, (3, 2))
+X, Y = blobs(100, 3, 2)

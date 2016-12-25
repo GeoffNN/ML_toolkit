@@ -1,6 +1,6 @@
 import numpy as np
+from scipy.linalg import inv, sqrtm
 from sklearn.neighbors import kneighbors_graph, radius_neighbors_graph
-from scipy.linalg import sqrtm, inv
 
 """This code is based on Daniel Calandriello's code for Michal Valko's Graphs in ML course (2016) at MVA - ENS Cachan."""
 
@@ -50,7 +50,7 @@ def build_graph(X, graph_params=GraphParams(), metric='euclidean'):
 def build_laplacian(W, laplacian_params):
     normalization = laplacian_params.normalization
     gamma = laplacian_params.gamma
-    D = np.diag(W.sum())
+    D = np.diag(W.sum(axis=0))
     if normalization is 'unn':
         L = D - W
     elif normalization is 'rw':

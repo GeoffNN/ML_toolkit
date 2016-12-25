@@ -60,7 +60,7 @@ class OnlineCoverState:
             idx = distances.argmax()
             c_add, c_rep = np.unravel_index(idx, distances.shape)
             dx = np.min(1. / (
-                np.exp(-pdist(self.centroids, datum, 'euclidean') / (2 * self.graph_param.sigma2)) + 10 ** (-30)));
+                np.exp(-pdist(self.centroids, datum, 'euclidean') / (2 * self.graph_param.sigma2)) + 10 ** (-30)))
 
             if c_rep not in self.taboo and c_rep > num_labels:
                 if np.sum(self.nodes_to_centroids_map == self.centroids_to_nodes_map[c_add]) > np.sum(
@@ -91,7 +91,6 @@ class OnlineCoverState:
             self.centroids_to_nodes[c_add] = t
             self.centroids += [datum]
             self.nodes_to_centroids_map[t] = c_add
-
 
         else:
             self.centroids_to_nodes_map.append(t)
