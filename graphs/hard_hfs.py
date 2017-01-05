@@ -44,6 +44,35 @@ def simple_hfs(X, Y, graph_params, laplacian_params):
     return labels + 1
 
 
+def soft_hfs(X, Y, c_l, c_u, L = None):
+    n_samples = len(X)
+    n_classes = len(np.unique(Y))
+    gamma = 0.001
+
+    # compute linear target for labelled samples
+    l_idx = np.nonzero(Y)[0]
+    u_idx = np.nonzero(Y == 0)[0]
+    n_l = len(l_idx)
+    y = -np.ones((n_samples, n_classes))
+    for i in range(n_l):
+        y[l_idx[i], int(Y[l_idx[i]] - 1)] = 1
+    # Compute solution
+
+    if L is None:
+        W = build_graph(X, graph_params)
+        L = build_laplacian(W, laplacian_params)
+
+    C = np.diag((c_l-c_u)*(Y != 0) + c_u)
+
+    Q = L + gamma*np.eye(len(L))
+    f = inv(inv(C).dot(Q) + np.eye(len(L))).dot(y)
+
+    labels = f.argmax(axis=1)
+    
+    return labels
+
+
+
 def iterative_hfs(X, Y, graph_params, laplacian_params, T=50):
     W = build_graph(X, graph_params)
     L = build_laplacian(W, laplacian_params)
