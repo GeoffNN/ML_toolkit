@@ -1,7 +1,7 @@
 import numpy as np
 from numpy.linalg import inv
 
-from graphs.graph_init import GraphParams, LaplacianParams, build_graph, build_laplacian
+from .graph_init import GraphParams, LaplacianParams, build_graph, build_laplacian
 
 
 # TODO: refactor using fit/transform
@@ -18,9 +18,10 @@ def hfs(X, Y, graph_params=GraphParams(), laplacian_params=LaplacianParams(), mo
         return online_hfs(X, Y, graph_params, laplacian_params)
 
 
-def simple_hfs(X, Y, graph_params, laplacian_params):
+def simple_hfs(X, Y, L, W):
     n_samples = len(X)
-    n_classes = len(np.unique(Y)) - 1
+    #n_classes = len(np.unique(Y)) - 1
+    n_classes = max(Y)
 
     # compute linear target for labelled samples
     l_idx = np.nonzero(Y)[0]
@@ -31,8 +32,8 @@ def simple_hfs(X, Y, graph_params, laplacian_params):
         y[i, int(Y[l_idx[i]] - 1)] = 1
     # Compute solution
     f_l = y
-    W = build_graph(X, graph_params)
-    L = build_laplacian(W, laplacian_params)
+    #W = build_graph(X, graph_params)
+    #L = build_laplacian(W, laplacian_params)
     f_u = inv(L[[[x] for x in u_idx], u_idx]).dot(W[[[x] for x in u_idx], l_idx]).dot(f_l)
 
     # Compute label assignment
@@ -41,7 +42,12 @@ def simple_hfs(X, Y, graph_params, laplacian_params):
     labels = np.zeros(n_samples)
     labels[l_idx] = l_l
     labels[u_idx] = l_u
-    return labels + 1
+    
+    confidence = np.vstack([np.zeros(n_samples) for i in range(int(n_classes))])
+    confidence[:,l_idx] = f_l.T
+    confidence[:,u_idx] = f_u.T
+    
+    return labels + 1, confidence.T
 
 
 def soft_hfs(X, Y, c_l, c_u, L = None):
