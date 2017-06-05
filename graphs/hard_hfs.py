@@ -20,8 +20,10 @@ def hfs(X, Y, graph_params=GraphParams(), laplacian_params=LaplacianParams(), mo
 
 def simple_hfs(X, Y, L, W):
     n_samples = len(X)
-    #n_classes = len(np.unique(Y)) - 1
-    n_classes = max(Y)
+    l_names = np.unique(list(Y)+[0])
+    Y = np.sum(np.array([(Y == n)*i for i, n in enumerate(l_names)]), axis = 0)
+    n_classes = len(l_names) - 1
+    #n_classes = max(Y)
 
     # compute linear target for labelled samples
     l_idx = np.nonzero(Y)[0]
@@ -47,7 +49,7 @@ def simple_hfs(X, Y, L, W):
     confidence[:,l_idx] = f_l.T
     confidence[:,u_idx] = f_u.T
     
-    return labels + 1, confidence.T
+    return l_names[list(map(int, labels+1))], confidence.T
 
 
 def soft_hfs(X, Y, c_l, c_u, L = None):
